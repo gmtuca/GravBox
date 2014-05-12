@@ -1,34 +1,28 @@
 package com.example.gravbox.app;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-
 import java.util.Random;
 
 /**
  * Created by gmtuk on 11/05/2014.
  */
-public class Ball extends SurfaceView implements SurfaceHolder.Callback, Gravitable, Circular {
+public class Ball implements Gravitable, Circular, Runnable {
 
     private float x, y;
     private int radius;
+    private BallSurfaceView ballSurfaceView;
     private Paint paint;
+    private float vx, vy;
 
-    private MainThread thread;
     private int r, g, b;
 
-    public Ball(Context context, float x, float y, int radius) {
-        super(context);
+    public Ball(float x, float y, int radius, BallSurfaceView ballSurfaceView) {
         this.x = x;
         this.y = y;
+        this.vx = 0.0f;
+        this.vy = 0.0f;
         this.radius = radius;
-
-        getHolder().addCallback(this);
-        this.thread = new MainThread(getHolder(), this);
+        this.ballSurfaceView = ballSurfaceView;
 
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -38,12 +32,22 @@ public class Ball extends SurfaceView implements SurfaceHolder.Callback, Gravita
         this.b =  rd.nextInt();
 
         this.paint.setARGB(1, r, g, b);
+
+        this.floor = ballSurfaceView.getHeight() - radius;
     }
 
-    private double t = 0;
-    private double v = 0;
-    private double elasticity = 0.8;
-    private double resistance = 1;
+    private int floor;
+
+    public void startBall(){
+        new Thread(this).start();
+    }
+
+    private double t = 1;
+
+    public void moveXYby(double dx, double dy){
+        x += dx;
+        y += dy;
+    }
 
     public float getX() {  return x;  }
     public void setX(float x) {  this.x = x; }
@@ -51,49 +55,50 @@ public class Ball extends SurfaceView implements SurfaceHolder.Callback, Gravita
     public float getY() { return y; }
     public void setY(float y) { this.y = y; }
 
-    public int getRadius() { return radius;  }
+    public int getRadius() { return radius; }
 
-    public double getResistance() { return resistance; }
-    public void setResistance(double resistance) { this.resistance = resistance; }
+    public double getElasticity() { return 0.8; }
 
-    public double getElasticity() { return elasticity; }
+    public float getVelocityX() { return vx;}
+    public void setVelocityX(float vx) {  this.vx = vx; }
 
-    public double getVelocity() { return v;}
-    public void setVelocity(double v) {  this.v = v; }
+    public float getVelocityY() { return vy;}
+    public void setVelocityY(float vy) {  this.vy = vy; }
 
     public double getTime() { return t; }
     public void setTime(double t) { this.t = t; }
 
-    public int getFloor(){ return getHeight() - radius; }
+    public int getFloor(){ return floor; }
 
-    public void move(){
-        Physics.applyGravity(this);
+    public int getMass(){
+        return radius; //this could be improved
+    }
+
+    public void run(){
+        while (true) {
+
+            Physics.applyGravity(this);
+
+            //TODO y += vy ??????
+
+            System.out.println("vx " + vx);
+            x += vx;
+
+            try {
+                Thread.sleep(25);
+            } catch (InterruptedException e) {
+                System.err.println("Ball has been interrupted");
+            }
+        }
+
+    }
+
+    public Paint getPaint() {
+        return paint;
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        canvas.drawCircle(x, y, radius, paint);
+    public String toString() {
+        return "Ball - (" + x + ", " + y + "), [" + radius + "], {" + r + ", " + g + ", " + b + "}";
     }
-
-    public void clearBall(Canvas canvas){
-        canvas.drawColor(Color.WHITE);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {  }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        thread.start();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {  }
-
-
-
-
-
 }

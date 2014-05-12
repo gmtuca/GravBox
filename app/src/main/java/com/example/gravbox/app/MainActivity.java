@@ -1,6 +1,8 @@
 package com.example.gravbox.app;
 
 import android.app.Activity;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,7 +16,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
 
-        setContentView(new Ball(this, 50, 50, 50));
+        //setContentView(new Ball(this, 450, 450, 50));
+        //setContentView(new Ball(this, 300, 300, 50));
+
+        BallSurfaceView ballSurfaceView = new BallSurfaceView(this);
+        setContentView(ballSurfaceView);
     }
 
 
