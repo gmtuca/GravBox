@@ -1,9 +1,6 @@
 package com.example.gravbox.app;
 
 import android.app.Activity;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,13 +13,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
 
-        //setContentView(new Ball(this, 450, 450, 50));
-        //setContentView(new Ball(this, 300, 300, 50));
-
-        BallSurfaceView ballSurfaceView = new BallSurfaceView(this);
-        setContentView(ballSurfaceView);
+        GravBoxSurfaceView gravBoxSurfaceView = new GravBoxSurfaceView(this);
+        setContentView(gravBoxSurfaceView);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -31,8 +24,6 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

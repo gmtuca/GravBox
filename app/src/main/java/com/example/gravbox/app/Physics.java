@@ -5,12 +5,17 @@ package com.example.gravbox.app;
  */
 public class Physics {
     public static final double GRAVITY = 9.8;
-    private static final double GRAVITY_ADJUSTMENT = 0.05;
+    private static final double GRAVITY_ADJUSTMENT = 0.01;
+
+    public static boolean PAUSED = false;
 
     public static void applyGravity(Gravitable gravitable){
+        if(PAUSED)
+            return;
+
         double t = gravitable.getTime();
-        float y = gravitable.getY();
-        float vy = gravitable.getVelocityY();
+        double y = gravitable.getY();
+        double vy = gravitable.getVy();
         int f = gravitable.getFloor();
         double e = gravitable.getElasticity();
 
@@ -26,14 +31,23 @@ public class Physics {
             y = f;
 
             if(vy > 0)
-                vy = (float)(-vy * e);
+                vy = (-vy * e);
 
             t = 1;
         }
 
         gravitable.setTime(t);
         gravitable.setY(y);
-        gravitable.setVelocityY(vy);
+        gravitable.setVy(vy);
+    }
+
+    public static boolean containsPoint(Circular c, double x, double y){
+        return distance(x, y, c.getX(), c.getY()) < c.getRadius();
+    }
+
+    public static boolean containsPoint(Quadrilateral q, double x, double y){
+        return x > q.getX() - q.getWidth()/2 && x < q.getX() + q.getWidth()/2 &&
+                y > q.getY() - q.getHeight()/2 && y < q.getY() + q.getHeight()/2;
     }
 
     public static boolean collide(Circular c1, Circular c2){
@@ -54,24 +68,28 @@ public class Physics {
         if(!collide(c1,c2))
             return null;
 
-        final float x = ((c1.getX() * c2.getRadius()) + (c2.getX() * c1.getRadius())) / (c1.getRadius() + c2.getRadius());
-        final float y = ((c1.getY() * c2.getRadius()) + (c2.getY() * c1.getRadius())) / (c1.getRadius() + c2.getRadius());
+        final double x = ((c1.getX() * c2.getRadius()) + (c2.getX() * c1.getRadius())) / (c1.getRadius() + c2.getRadius());
+        final double y = ((c1.getY() * c2.getRadius()) + (c2.getY() * c1.getRadius())) / (c1.getRadius() + c2.getRadius());
 
         return new Point() {
             @Override
-            public float getX() {
+            public double getX() {
                 return x;
             }
 
             @Override
-            public float getY() {
+            public double getY() {
                 return y;
             }
         };
     }
 
-    public static float distance(Point p1, Point p2){
-        return (float)Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
+    public static double distance(double x1, double y1, double x2, double y2){
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
+
+    public static double distance(Point p1, Point p2){
+        return distance(p1.getX(), p1.getY(), p2.getX(), p2.getY());
     }
 
 }

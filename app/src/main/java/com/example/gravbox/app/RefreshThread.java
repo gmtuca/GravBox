@@ -9,11 +9,11 @@ import android.view.SurfaceHolder;
 public class RefreshThread extends Thread {
 
     private final SurfaceHolder surfaceHolder;
-    private BallSurfaceView ballSurfaceView;
+    private GravBoxSurfaceView gravBoxSurfaceView;
 
-    public RefreshThread(BallSurfaceView ballSurfaceView){
-        this.surfaceHolder = ballSurfaceView.getHolder();
-        this.ballSurfaceView = ballSurfaceView;
+    public RefreshThread(GravBoxSurfaceView gravBoxSurfaceView){
+        this.surfaceHolder = gravBoxSurfaceView.getHolder();
+        this.gravBoxSurfaceView = gravBoxSurfaceView;
     }
 
     @Override
@@ -24,65 +24,65 @@ public class RefreshThread extends Thread {
 
         while (true) {
 
-            synchronized (ballSurfaceView.getBalls()) {
-                for (Ball b1 : ballSurfaceView.getBalls())
-                    for (Ball b2 : ballSurfaceView.getBalls())
-                        if (b1 != b2 && Physics.collide(b1, b2)) {
-                            System.out.println("Balls collide!");
-
-                            //double newvx = (b1.getVelocityX() * (m1 – m2) + (2 * m2 * b2.getVelocityX()))
-                            /// (m1 + m2);;
-
-                            int m1 = b1.getMass();
-                            int m2 = b2.getMass();
-
-                            float vx1 = b1.getVelocityX();
-                            float vx2 = b2.getVelocityX();
-
-                            float vy1 = b1.getVelocityY();
-                            float vy2 = b2.getVelocityY();
-
-                            vx1 = (float) ((vx1 * (m1 - m2) + (2 * m2 * vx2)) / (double) (m1 + m2));
-                            vy1 = (float) ((vy1 * (m1 - m2) + (2 * m2 * vy2)) / (double) (m1 + m2));
-                            vx2 = (float) ((vx2 * (m2 - m1) + (2 * m1 * vx1)) / (double) (m1 + m2));
-                            vy2 = (float) ((vy2 * (m2 - m1) + (2 * m1 * vy1)) / (double) (m1 + m2));
-
-
-                            double theta = Physics.collisionAngle(b1, b2);
-                            float lenth_in = b1.getRadius() + b2.getRadius() - Physics.distance(b1, b2);
-
-                            double dy = lenth_in * Math.sin(theta);
-                            double dx = dy / Math.tan(theta);
-
-                            b1.setVelocityX(vx1); //it's always zero TODO
-                            b2.setVelocityX(vx2); //same here.....
-
-                            b1.setVelocityY(vy1);
-                            b2.setVelocityY(vy2);
-
-                            b1.moveXYby(-dx/1.5 , -dy/1.5);
-                            b2.moveXYby(dx/1.5, dy/1.5);
-
-
-                        }
-                }
+//            synchronized (gravBoxSurfaceView.getBalls()) {
+//                for (DynamicBall b1 : gravBoxSurfaceView.getBalls())
+//                    for (DynamicBall b2 : gravBoxSurfaceView.getBalls())
+//                        if (b1 != b2 && Physics.collide(b1, b2)) {
+//                            System.out.println("Balls collide!");
+//
+//                            //double newvx = (b1.getVx() * (m1 – m2) + (2 * m2 * b2.getVx()))
+//                            /// (m1 + m2);;
+//
+//                            int m1 = b1.getMass();
+//                            int m2 = b2.getMass();
+//
+//                            double vx1 = b1.getVx();
+//                            double vx2 = b2.getVx();
+//
+//                            double vy1 = b1.getVy();
+//                            double vy2 = b2.getVy();
+//
+//
+//                            double theta = Physics.collisionAngle(b1, b2);
+//                            double length_in = b1.getRadius() + b2.getRadius() - Physics.distance(b1, b2);
+//
+//                            double dy = length_in * Math.sin(theta);
+//                            double dx = dy / Math.tan(theta);
+//
+//                            //THIS ALL SEEMS TO BE WRONG
+//                            vx1 = (float) ((vx1 * (m1 - m2) + (2 * m2 * vx2)) / (double) (m1 + m2));
+//                            vy1 = (float) ((vy1 * (m1 - m2) + (2 * m2 * vy2)) / (double) (m1 + m2));
+//                            vx2 = (float) ((vx2 * (m2 - m1) + (2 * m1 * vx1)) / (double) (m1 + m2));
+//                            vy2 = (float) ((vy2 * (m2 - m1) + (2 * m1 * vy1)) / (double) (m1 + m2));
+//
+//                            b1.setVx((float)-dx); //it's always zero TODO
+//                            b2.setVx((float)dx); //same here.....
+//
+//                            b1.setVy(vy1);
+//                            b2.setVy(vy2);
+//
+//                            b1.moveBy(-dx/1.5 , -dy/1.5);
+//                            b2.moveBy(dx/1.5, dy/1.5);
+//
+//
+//                        }
+//                }
 
                 try {
                     canvas = surfaceHolder.lockCanvas(null);
 
                     synchronized (surfaceHolder) {
                         if(canvas != null){
-                            ballSurfaceView.clearCanvas(canvas);
-                            ballSurfaceView.onDraw(canvas);
+                            Drawer.clearCanvas(canvas);
+                            gravBoxSurfaceView.onDraw(canvas);
                         }
                     }
                 }
                 finally {
                     if (canvas != null)
                         surfaceHolder.unlockCanvasAndPost(canvas);
-
                 try {
-                    Thread.sleep(25);
+                    Thread.sleep(5);
                 }
                 catch (InterruptedException e) {
                     System.err.println("Clearing has been interrupted");
